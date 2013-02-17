@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="lib/jquery-1.9.1.js"></script>
+<script src="lib/d3.js"></script>
+<script src="d3.layout.cloud.js"></script>
+<script src="obituary.js"></script>
+
+<body onload="drawWordle(seasonInput.value,yearInput.value)">
+
+<script>
+
+var stopWords=["sir","mr","a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"];
+var maxIterations=5;
+
+var summerMonths=["04","05","06","07","08","09"];
+
+var wordBag=new Array();
+var obitWords,obitWord;
+var fill = d3.scale.category20b();
+
+function drawWordle(season,year) {
+
+	var currentIteration=0;
+
+	for (var i=0;i<obits.length;i++) {
+
+		var obitYear=obits[i].obit_date.substring(obits[i].obit_date.length-4);
+
+		var obitSeason=(summerMonths.indexOf(obits[i].obit_date.substring(3,5))==-1)?"winter":"summer";
+
+		if (obitYear==year && obitSeason==season) {
+
+			obitWords=obits[i].obit_text.split(" ");
+
+			for (j=0;j<obitWords.length;j++) {
+
+				obitWord=obitWords[j].toLowerCase().replace(".","").replace(",","");
+				if (stopWords.indexOf(obitWord)==-1&&!/\d/.test(obitWord)&&obitWord.length>2) {
+
+					wordBag.push(obitWord);
+				}
+			}
+			if (currentIteration++>maxIterations)
+				break;	
+		}
+	}
+
+	 
+	  d3.layout.cloud().size([300, 300])
+	      .words(wordBag.map(function(d) {
+		return {text: d, size: 10 + Math.random() * 90};
+	      }))
+	      .rotate(function() { return ~~(Math.random() * 2) * 90; })
+	      .font("Black Letter")
+	      .fontSize(function(d) { return d.size; })
+	      .on("end", draw)
+	      .start();
+}
+
+function draw(words) {
+	d3.select("svg").remove();
+	    d3.select("body").append("svg")
+		.attr("width", 300)
+		.attr("height", 300)
+	      .append("g")
+		.attr("transform", "translate(150,150)")
+	      .selectAll("text")
+		.data(words)
+	      .enter().append("text")
+		.style("font-size", function(d) { return d.size + "px"; })
+		.style("font-family", "serif")
+		.style("fill", function(d, i) { return fill(i); })
+		.attr("text-anchor", "middle")
+		.attr("transform", function(d) {
+		  return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+		})
+		.text(function(d) { return d.text; });
+}
+</script>
+
+<p>
+<select id="seasonInput"><option value="winter" selected>Winter</option><option value="summer">Summer</option></select>
+<select id="yearInput">
+<option value="1871">1871</option>
+<option value="1872">1872</option>
+<option value="1873">1873</option>
+<option value="1874">1874</option>
+<option value="1875">1875</option>
+<option value="1876">1876</option>
+<option value="1877">1877</option>
+<option value="1878">1878</option>
+<option value="1879">1879</option>
+<option value="1880">1880</option>
+<option value="1881">1881</option>
+<option value="1882">1882</option>
+<option value="1883">1883</option>
+<option value="1884">1884</option>
+<option value="1885">1885</option>
+<option value="1886">1886</option>
+<option value="1887">1887</option>
+<option value="1888">1888</option>
+<option value="1889">1889</option>
+<option value="1890">1890</option>
+<option value="1891">1891</option>
+<option value="1892">1892</option>
+<option value="1893">1893</option>
+<option value="1894">1894</option>
+<option value="1895">1895</option>
+<option value="1896">1896</option>
+<option value="1897">1897</option>
+<option value="1898">1898</option>
+<option value="1899">1899</option>
+<option value="1900" selected>1900</option>
+<option value="1901">1901</option>
+<option value="1902">1902</option>
+<option value="1903">1903</option>
+<option value="1904">1904</option>
+<option value="1905">1905</option>
+<option value="1906">1906</option>
+<option value="1907">1907</option>
+<option value="1908">1908</option>
+<option value="1909">1909</option>
+<option value="1910">1900</option>
+<option value="1911">1911</option>
+<option value="1912">1912</option>
+<option value="1913">1913</option>
+<option value="1914">1914</option>
+<option value="1915">1915</option>
+<option value="1916">1916</option>
+<option value="1917">1917</option>
+<option value="1918">1918</option>
+<option value="1919">1919</option>
+<option value="1920">1920</option>
+<option value="1921">1921</option>
+</select>
+<input type="button" value=">" onclick="drawWordle(seasonInput.value,yearInput.value)"></input>
+
+
+
